@@ -8,7 +8,11 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//app.use('/api',router);
+const stateRoutes = require('./routes/staeRoute');
+app.use('/api/states', stateRoutes);
+
+const districtRoutes = require('./routes/districtRoute');
+app.use('/api/disctricts', districtRoutes);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () =>{

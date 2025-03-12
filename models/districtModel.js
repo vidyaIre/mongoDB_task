@@ -16,5 +16,5 @@ const districtSchema = new mongoose.Schema({
         required: true
     }
 });
-const districtModel =mongoose.model('District', districtSchema);
+const districtModel =mongoose.model('Districts', districtSchema);
 module.exports = districtModel;
