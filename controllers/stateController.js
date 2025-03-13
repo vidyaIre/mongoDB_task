@@ -59,5 +59,37 @@ module.exports = {
                 message: "Internal server error"
             });
         }
+    },
+    getStatePopulation: async (req, res) => {
+        try {
+            const { name} = req.params;
+            console.log("name is:",name);
+
+            const state = await stateModel.findOne({ name});
+            console.log("state is :", state);
+
+            if(state){
+                res.json({
+                    state: name,
+                    population: state.population
+                })
+            }
+            else{
+                return res.status(404).json({
+                    success: false,
+                    statusCode: 404,
+                    message: "State not found"
+                })
+            }
+
+        } catch (error) {
+            console.log("error is:", error);
+            return res.status(500).json({
+                success: false,
+                statusCode: 500,
+                message: " Internal server error",
+                data: error.message
+            })
+        }
     }
 }

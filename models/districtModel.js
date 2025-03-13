@@ -14,7 +14,17 @@ const districtSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: stateModel,
         required: true
+    }, isActive: {
+        type: Boolean,
+        default: true
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
-});
+}, {
+    timestamps: true,
+}
+);
 const districtModel =mongoose.model('Districts', districtSchema);
 module.exports = districtModel;

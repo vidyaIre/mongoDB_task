@@ -12,7 +12,17 @@ const stateSchema = new mongoose.Schema({
     area: {
         type: Number,
         required: true
+    }, isActive: {
+        type: Boolean,
+        default: true
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
-});
+}, {
+    timestamps: true,
+}
+);
 const stateModel =mongoose.model('States', stateSchema);
 module.exports = stateModel;
