@@ -63,7 +63,7 @@ module.exports = {
                     success: false,
                     statusCode: 400,
                     message: "Invalid population value. Population must be a positive number",
-                   
+
                 });
             }
             const district = await districtModel.findOneAndUpdate(
@@ -105,25 +105,74 @@ module.exports = {
             const { name } = req.params;
             //console.log(name);
 
-            const district = await districtModel.findOneAndDelete({ name: name.trim});
-            console.log(district);
-            if(district){
-                console.log(district);
-               return res.status(200).json({
+            const district = await districtModel.findOneAndDelete({ name: name.trim });
+            //console.log(district);
+            if (district) {
+                //console.log(district);
+                return res.status(200).json({
                     success: true,
                     statusCode: 200,
-                    message:"District deleted successfully",
+                    message: "District deleted successfully",
                     data: district.message
                 })
             }
-            else{
-               return res.status(400).json({
+            else {
+                return res.status(400).json({
                     success: false,
                     statusCode: 400,
-                    message:"District not found"
+                    message: "District not found"
                 })
             }
-        }  catch (error) {
+        } catch (error) {
+            // console.log("error is:", error);
+            return res.status(500).json({
+                success: false,
+                statusCode: 500,
+                message: "Internal server error"
+            });
+        }
+    },
+    groupAndSortDistrictByPopulation: async (req, res) => {
+        try {
+            const groupData = await districtModel.aggregate([
+
+                {
+                    $lookup: {
+                        from: "states",
+                        localField: "state_id",
+                        foreignField: "_id",
+                        as: "stateDetails"
+                    }
+                },
+                {
+                    $unwind: "$stateDetails"
+                },
+                {
+                    $sort: { name: 1 }
+                },
+                {
+                    $group: {
+                        _id: "$stateDetails.name",
+                        total: { $sum: "$population" },
+                        districts: {
+                            $push: "$name"
+                        }
+                    }
+                },
+                {
+                    $sort: { total: -1 }
+                }
+            ]);
+            console.log(groupData);
+
+            res.status(200).json({
+                success: true,
+                statusCode: 200,
+                message: "Grouped and sorted by population",
+                data: groupData
+            });
+
+        } catch (error) {
             console.log("error is:", error);
             return res.status(500).json({
                 success: false,

@@ -94,7 +94,7 @@ module.exports = {
     },
     totalPopulation: async (req, res) => {
         try {
-            console.log(req.body);
+            
             const total = await stateModel.aggregate([
                 {
                     $group: {
