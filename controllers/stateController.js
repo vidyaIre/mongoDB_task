@@ -94,7 +94,7 @@ module.exports = {
     },
     totalPopulation: async (req, res) => {
         try {
-            
+
             const total = await stateModel.aggregate([
                 {
                     $group: {
@@ -119,9 +119,72 @@ module.exports = {
                 statusCode: 500,
                 message: " Internal server error",
                 data: error.message
-            })
+            });
         }
 
 
+    },
+    avgPopulationDensity: async (req, res) => {
+        try {
+            const avgData = await stateModel.aggregate([
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        population: 1,
+                        area: 1,
+                        density: { $divide: [ "$population", "$area" ] }
+                    }
+                },
+                {
+                    $sort: { density: -1 }
+                }
+            ]);
+            console.log(avgData);
+            res.status(200).json({
+                success: true,
+                statusCode: 200,
+                count: avgData.length,
+                message: "Retrieve avg population density of each states",
+                data: avgData
+            })
+
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                statusCode: 500,
+                message: " Internal server error",
+                data: error.message
+            });
+        }
+    },
+    getAllStates: async (req, res) => {
+        try{
+            const states = await stateModel.find();
+            if(states){
+                return res.status(200).json({
+                    success: true,
+                    statusCode: 200,
+                    count: states.length,
+                    message: "Retrieve all staes........",
+                    data: states
+                }); 
+            }else {
+                return res.status(400).json({
+                    success: false,
+                    statusCode: 400,
+                    message: "no data in database"
+                }); 
+            }
+
+        } catch (error) {
+            console.log("error is:", error);
+            return res.status(500).json({
+                success: false,
+                statusCode: 500,
+                message: "Internal server error"
+            }); 
+        }
     }
+
 }

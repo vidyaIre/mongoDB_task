@@ -168,6 +168,7 @@ module.exports = {
             res.status(200).json({
                 success: true,
                 statusCode: 200,
+                count: groupData.length,
                 message: "Grouped and sorted by population",
                 data: groupData
             });
@@ -178,6 +179,76 @@ module.exports = {
                 success: false,
                 statusCode: 500,
                 message: "Internal server error"
+            });
+        }
+    },
+    getDistrictWithState: async (req, res) => {
+        try {
+            const details = await districtModel.aggregate([
+                {
+                    $lookup: {
+                        from: "states",
+                        localField: "state_id",
+                        foreignField: "_id",
+                        as: "stateDetails"
+                    }
+                },
+                {
+                    $unwind: "$stateDetails"
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        population: 1,
+                        "stateDetails._id": 1,
+                        "stateDetails.name": 1,
+                        "stateDetails.area": 1
+                    }
+                }
+            ]);
+            //console.log(details);
+            res.status(200).json({
+                success: true,
+                statusCode: 200,
+                message: "Retrieved districts with state details",
+                data: details
+            });
+
+        } catch (error) {
+            console.log("error is:", error);
+            return res.status(500).json({
+                success: false,
+                statusCode: 500,
+                message: "Internal server error"
+            });
+        }
+    },
+    getAllDistricts: async (req, res) => {
+        try {
+            const district = await districtModel.find();
+            if (district) {
+                res.status(200).json({
+                    success: true,
+                    statusCode: 200,
+                    count: district.length,
+                    message: "Retrieved all districts successfully.",
+                    data: district
+                });
+            } else {
+                return res.status(404).json({
+                    success: false,
+                    statusCode: 404,
+                    message: "No districts found in the database."
+                });
+            }
+
+        } catch (error) {
+            console.error("Error fetching districts:", error);
+            res.status(500).json({
+                success: false,
+                statusCode: 500,
+                message: "Internal Server Error"
             });
         }
     }
