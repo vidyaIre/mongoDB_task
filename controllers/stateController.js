@@ -20,9 +20,9 @@ module.exports = {
                             statusCode: 201,
                             message: "User added successfully",
                             data: newState
-                           
 
-                            
+
+
                         });
                     })
                     .catch((error) => {
@@ -52,7 +52,7 @@ module.exports = {
                 });
             }
         } catch (error) {
-           // console.log("error is:", error);
+            // console.log("error is:", error);
             return res.status(500).json({
                 success: false,
                 statusCode: 500,
@@ -62,19 +62,19 @@ module.exports = {
     },
     getStatePopulation: async (req, res) => {
         try {
-            const { name} = req.params;
-            console.log("name is:",name);
+            const { name } = req.params;
+            console.log("name is:", name);
 
-            const state = await stateModel.findOne({ name});
+            const state = await stateModel.findOne({ name });
             console.log("state is :", state);
 
-            if(state){
+            if (state) {
                 res.json({
                     state: name,
                     population: state.population
                 })
             }
-            else{
+            else {
                 return res.status(404).json({
                     success: false,
                     statusCode: 404,
@@ -91,5 +91,37 @@ module.exports = {
                 data: error.message
             })
         }
+    },
+    totalPopulation: async (req, res) => {
+        try {
+            console.log(req.body);
+            const total = await stateModel.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        total: { $sum: "$population" }
+                    }
+                }
+            ]);
+            console.log(total);
+            const sumValue = total.length > 0 ? total[0].total : 0;
+
+            res.status(200).json({
+                success: true,
+                statusCode: 200,
+                message: "Total population calculated successfully",
+                data: sumValue
+            })
+        } catch (error) {
+            console.log("error is:", error);
+            return res.status(500).json({
+                success: false,
+                statusCode: 500,
+                message: " Internal server error",
+                data: error.message
+            })
+        }
+
+
     }
 }

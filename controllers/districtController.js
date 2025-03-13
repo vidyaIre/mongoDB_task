@@ -105,7 +105,7 @@ module.exports = {
             const { name } = req.params;
             //console.log(name);
 
-            const district = await districtModel.findOneAndDelete({ name});
+            const district = await districtModel.findOneAndDelete({ name: name.trim});
             console.log(district);
             if(district){
                 console.log(district);
